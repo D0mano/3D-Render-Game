@@ -13,11 +13,20 @@ class Game:
         self.map_col = 10
         self.map_row = 10
         self.tile_original_size = 16
-        self.scale = 3
+        self.scale = 5
         self.tile_size = self.tile_original_size * self.scale
         self.screen_size = self.map_col * self.tile_size, self.map_row * self.tile_size
         self.screen = pygame.display.set_mode(self.screen_size)
-        self.tile_map = self.create_random_tile_map()
+        self.tile_map = [[ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                         [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                         [ 1, 0, 0, 0, 0, 1, 1, 1, 0, 1],
+                         [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                         [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                         [ 1, 0, 1, 1, 0, 0, 0, 1, 1, 1],
+                         [ 1, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+                         [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                         [ 1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+                         [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
 
         self.player = Player(self)
         self.running = True
@@ -26,7 +35,9 @@ class Game:
 
 
 
-
+    def is_wall(self, map_x, map_y):
+        col,row = int(map_x//self.tile_size), int(map_y//self.tile_size)
+        return self.tile_map[col][row] == 1
 
     def draw_tile_map(self):
         for y in range(self.map_row):
