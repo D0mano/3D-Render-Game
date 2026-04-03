@@ -21,6 +21,7 @@ class Player:
         self.q_key_pressed = False
         self.s_key_pressed = False
         self.d_key_pressed = False
+
     @property
     def row(self)->int:
         """
@@ -49,8 +50,9 @@ class Player:
         :param direction: 1 forward or -1 backward
         :return: None
         """
-        self.rect.x = self.rect.x + direction * self.direction[0] * self.velocity
-        self.rect.y = self.rect.y + direction * self.direction[1] * self.velocity
+        if not self.check_collision(direction):
+            self.rect.x = self.rect.x + direction * self.direction[0] * self.velocity
+            self.rect.y = self.rect.y + direction * self.direction[1] * self.velocity
 
     def rotate(self,direction):
         """
@@ -63,6 +65,18 @@ class Player:
         self.angle %= 2 * math.pi
         self.direction[0] = math.cos(self.angle)
         self.direction[1] = math.sin(self.angle)
+
+    def check_collision(self,direction)->bool:
+        x = self.rect.x + direction * self.direction[0] * self.velocity
+        y = self.rect.y + direction * self.direction[1] * self.velocity
+
+        if self.direction[0]*direction > 0:
+            x += self.rect.width
+        if self.direction[1]*direction > 0:
+            y += self.rect.height
+        return self.game.is_wall(x, y)
+
+
 
     def update(self):
         if self.z_key_pressed:
@@ -163,18 +177,15 @@ class Player:
         vertical_distance = utils.distance((self.x,self.y),(vertical_hit_x,vertical_hit_y)) if found_vertical_wall else 99999
 
         if horizontal_distance < vertical_distance:
-            pygame.draw.line(self.game.screen,(0,255,0),(self.x,self.y),(horizontal_hit_x,horizontal_hit_y))
+            pygame.draw.line(self.game.screen,color,(self.x,self.y),(horizontal_hit_x,horizontal_hit_y))
         else:
-            pygame.draw.line(self.game.screen, (0, 255, 0), (self.x, self.y), (vertical_hit_x, vertical_hit_y))
-
-
+            pygame.draw.line(self.game.screen, color, (self.x, self.y), (vertical_hit_x, vertical_hit_y))
 
     def draw_ray_casting(self, fov=None):
-        steps = 50
         fov = math.radians(self.FOV) if fov is None else math.radians(fov)
-        angular_shift = fov / steps
+        angular_shift = fov / self.NUM_RAYS
         start_angle = self.angle - fov/2
-        for step in range(steps):
+        for step in range(self.NUM_RAYS):
             self.cast_ray(start_angle + step * angular_shift, (0, 255, 0))
 
 
