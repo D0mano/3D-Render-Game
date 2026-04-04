@@ -70,11 +70,31 @@ class Player:
         x = self.rect.x + direction * self.direction[0] * self.velocity
         y = self.rect.y + direction * self.direction[1] * self.velocity
 
-        if self.direction[0]*direction > 0:
-            x += self.rect.width
-        if self.direction[1]*direction > 0:
-            y += self.rect.height
-        return self.game.is_wall(x, y)
+        if self.direction[1]*direction < 0: #We are going up
+            top_y = y
+            left_x = x
+            right_x = x+self.rect.width
+            if self.game.is_wall(left_x, top_y) or self.game.is_wall(right_x, top_y):
+                return True
+        if self.direction[1]*direction > 0: #We are going down
+            bottom_y = y+self.rect.height
+            left_x = x
+            right_x = x+self.rect.width
+            if self.game.is_wall(left_x, bottom_y) or self.game.is_wall(right_x, bottom_y):
+                return True
+        if self.direction[0]*direction < 0: #We are going left
+            left_x = x
+            top_y = y
+            bottom_y = y+self.rect.height
+            if self.game.is_wall(left_x,top_y) or self.game.is_wall(left_x,bottom_y):
+                return True
+        if self.direction[0]*direction > 0: # We are going right
+            right_x = x + self.rect.width
+            top_y = y
+            bottom_y = y+self.rect.height
+            if self.game.is_wall(right_x,top_y) or self.game.is_wall(right_x,bottom_y):
+                return True
+        return False
 
 
 
