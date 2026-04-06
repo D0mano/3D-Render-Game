@@ -47,7 +47,7 @@ class Player:
     def move(self,direction):
         """
         Move the player
-        :param direction: 1 forward or -1 backward
+        :param direction:To move forward 1 To move backward -1
         :return: None
         """
         if not self.check_collision(direction):
@@ -159,7 +159,7 @@ class Player:
 
         ya = -self.game.tile_size if math.sin(angle) < 0 else self.game.tile_size
         xa = ya / math.tan(angle)
-        while self.game.screen_size[0] >= next_horizontal_x >= 0 and self.game.screen_size[1] >= next_horizontal_y >= 0:
+        while self.game.screen_size[0] > next_horizontal_x >= 0 and self.game.screen_size[1] > next_horizontal_y >= 0:
             if self.game.is_wall(next_horizontal_x, next_horizontal_y):
                 found_horizontal_wall = True
                 horizontal_hit_x , horizontal_hit_y = next_horizontal_x, next_horizontal_y
@@ -170,8 +170,8 @@ class Player:
 
         # VERTICAL CHECK
         found_vertical_wall = False
-        vertical_hit_x = 0
-        vertical_hit_y = 0
+        vertical_hit_x = self.x + 1000 * math.cos(angle)
+        vertical_hit_y = self.y + 1000 * math.sin(angle)
         if math.cos(angle) > 0:
             first_intersection_x = (self.x // self.game.tile_size) * self.game.tile_size + self.game.tile_size
         else:
@@ -184,7 +184,7 @@ class Player:
         xa = self.game.tile_size if math.cos(angle) > 0 else -self.game.tile_size
         ya = xa * math.tan(angle)
 
-        while self.game.screen_size[0] >= next_vertical_x >= 0 and self.game.screen_size[1] >= next_vertical_y >= 0:
+        while self.game.screen_size[0] > next_vertical_x >= 0 and self.game.screen_size[1] > next_vertical_y >= 0:
             if self.game.is_wall(next_vertical_x, next_vertical_y):
                 found_vertical_wall = True
                 vertical_hit_x, vertical_hit_y = next_vertical_x, next_vertical_y
@@ -200,6 +200,7 @@ class Player:
             pygame.draw.line(self.game.screen,color,(self.x,self.y),(horizontal_hit_x,horizontal_hit_y))
         else:
             pygame.draw.line(self.game.screen, color, (self.x, self.y), (vertical_hit_x, vertical_hit_y))
+
 
     def draw_ray_casting(self, fov=None):
         fov = math.radians(self.FOV) if fov is None else math.radians(fov)
