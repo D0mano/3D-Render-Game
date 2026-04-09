@@ -96,8 +96,6 @@ class Player:
                 return True
         return False
 
-
-
     def update(self):
         if self.z_key_pressed:
             #self.rect.y -= self.velocity
@@ -134,80 +132,14 @@ class Player:
                 self.q_key_pressed = False
 
     def draw(self):
+        self.draw_player()
+
+
+    def draw_player(self):
         pygame.draw.rect(self.game.screen,(100,100,100),self.rect)
-        self.draw_ray_casting()
-        self.cast_ray(self.angle,(255,0,0))
-
-    def cast_ray(self, angle, color=(255, 0, 0)):
-        # HORIZONTAL CHEK
-        found_horizontal_wall = False
-        horizontal_hit_x = 0
-        horizontal_hit_y = 0
-
-        first_intersection_x = None
-        first_intersection_y = None
-
-        if math.sin(angle) < 0:
-            first_intersection_y = (self.y // self.game.tile_size) * self.game.tile_size - 1
-        else:
-            first_intersection_y = ((self.y // self.game.tile_size) * self.game.tile_size) + self.game.tile_size
-
-        first_intersection_x = self.x + (first_intersection_y - self.y) / math.tan(angle)
-
-        next_horizontal_x = first_intersection_x
-        next_horizontal_y = first_intersection_y
-
-        ya = -self.game.tile_size if math.sin(angle) < 0 else self.game.tile_size
-        xa = ya / math.tan(angle)
-        while self.game.screen_size[0] > next_horizontal_x >= 0 and self.game.screen_size[1] > next_horizontal_y >= 0:
-            if self.game.is_wall(next_horizontal_x, next_horizontal_y):
-                found_horizontal_wall = True
-                horizontal_hit_x , horizontal_hit_y = next_horizontal_x, next_horizontal_y
-                break
-            next_horizontal_x += xa
-            next_horizontal_y += ya
+        #pygame.draw.circle(self.game.screen,(100,100,100),self.rect.center,self.rect.width//2)
 
 
-        # VERTICAL CHECK
-        found_vertical_wall = False
-        vertical_hit_x = self.x + 1000 * math.cos(angle)
-        vertical_hit_y = self.y + 1000 * math.sin(angle)
-        if math.cos(angle) > 0:
-            first_intersection_x = (self.x // self.game.tile_size) * self.game.tile_size + self.game.tile_size
-        else:
-            first_intersection_x = (self.x // self.game.tile_size) * self.game.tile_size - 1
-
-        first_intersection_y = self.y + (first_intersection_x - self.x) * math.tan(angle)
-        next_vertical_x = first_intersection_x
-        next_vertical_y = first_intersection_y
-
-        xa = self.game.tile_size if math.cos(angle) > 0 else -self.game.tile_size
-        ya = xa * math.tan(angle)
-
-        while self.game.screen_size[0] > next_vertical_x >= 0 and self.game.screen_size[1] > next_vertical_y >= 0:
-            if self.game.is_wall(next_vertical_x, next_vertical_y):
-                found_vertical_wall = True
-                vertical_hit_x, vertical_hit_y = next_vertical_x, next_vertical_y
-                break
-            next_vertical_x += xa
-            next_vertical_y += ya
-
-        # DISTANCE CALCULATION
-        horizontal_distance = utils.distance((self.x,self.y),(horizontal_hit_x,horizontal_hit_y)) if found_horizontal_wall else 99999
-        vertical_distance = utils.distance((self.x,self.y),(vertical_hit_x,vertical_hit_y)) if found_vertical_wall else 99999
-
-        if horizontal_distance < vertical_distance:
-            pygame.draw.line(self.game.screen,color,(self.x,self.y),(horizontal_hit_x,horizontal_hit_y))
-        else:
-            pygame.draw.line(self.game.screen, color, (self.x, self.y), (vertical_hit_x, vertical_hit_y))
-
-
-    def draw_ray_casting(self, fov=None):
-        fov = math.radians(self.FOV) if fov is None else math.radians(fov)
-        angular_shift = fov / self.NUM_RAYS
-        start_angle = self.angle - fov/2
-        for step in range(self.NUM_RAYS):
-            self.cast_ray(start_angle + step * angular_shift, (0, 255, 0))
 
 
 
