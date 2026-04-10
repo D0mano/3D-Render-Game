@@ -26,9 +26,10 @@ class Game:
         return self.map.is_wall(map_x, map_y)
 
     def draw(self):
-        self.map.draw()
-        self.player.draw()
-        self.ray_engine.draw_ray_casting()
+        self.screen.fill((0,0,0))
+        # self.map.draw()
+        # self.player.draw()
+        self.ray_engine.draw()
 
     def update(self):
         for event in pygame.event.get():

@@ -5,15 +5,18 @@ import utils
 
 class RayEngine:
     FOV = 60
-    NUM_RAYS = 50
+    NUM_RAYS = 1000
     MAX_DEPTHS = 30
+    RES  = 1
 
     def __init__(self,game):
         self.game = game
         self.rays = [{} for _ in range(self.NUM_RAYS)]
+
     @property
     def player(self):
         return self.game.player
+
     @property
     def map(self):
         return self.game.map
@@ -32,9 +35,9 @@ class RayEngine:
 
     def cast_ray(self, angle):
         # HORIZONTAL CHEK
-        if math.sin(angle) < 0:
+        if math.sin(angle) < 0: # going up
             first_intersection_y = (self.player.y // self.game.tile_size) * self.game.tile_size - 1
-        else:
+        else: # going down
             first_intersection_y = ((self.player.y // self.game.tile_size) * self.game.tile_size) + self.game.tile_size
 
         first_intersection_x = self.player.x + (first_intersection_y - self.player.y) / math.tan(angle)
@@ -75,8 +78,10 @@ class RayEngine:
         vertical_distance = utils.distance((self.player.x,self.player.y),vertical_hit )
 
         if horizontal_distance < vertical_distance:
+            horizontal_distance = horizontal_distance *math.cos(angle - self.player.angle)
             return {'dist':horizontal_distance,'hit':horizontal_hit,'side':'horizontal'}
         else:
+            vertical_distance = vertical_distance * math.cos(angle - self.player.angle)
             return {'dist':vertical_distance,'hit':vertical_hit,'side':'vertical'}
 
     def draw_2d_ray(self,ray_result,color=(255,0,0)):
@@ -85,7 +90,16 @@ class RayEngine:
             return
         pygame.draw.line(self.game.screen,color,(self.player.x,self.player.y),ray_result['hit'])
 
-    def draw_ray_casting(self):
-        for ray in self.rays:
-            self.draw_2d_ray(ray,(0, 255, 0))
+    def draw(self):
+        for i,ray in enumerate(self.rays):
+
+            # self.draw_2d_ray(ray,(0, 255, 0))
+
+            color = (255,255,255) if ray['side'] == 'vertical' else (160,160,160)
+            line_height = (self.game.tile_size / ray['dist']) * 415
+
+            draw_begin = (self.game.screen_size[1] / 2) - (line_height / 2)
+            draw_end =  line_height
+
+            pygame.draw.rect(self.game.screen,color,(i*self.RES,draw_begin,self.RES,draw_end))
         self.draw_2d_ray(self.cast_ray(self.player.angle))

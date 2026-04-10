@@ -8,7 +8,7 @@ class Player:
 
     def __init__(self,game):
         self.game = game
-        self.rect = pygame.Rect(0,0, self.game.tile_size/2,self.game.tile_size/2)
+        self.rect = pygame.Rect(0,0, self.game.tile_size/4,self.game.tile_size/4)
         self.rect.center = (5 * self.game.tile_size ,5 * self.game.tile_size)
 
         self.angle = -math.pi/2                     #in rad
@@ -50,9 +50,10 @@ class Player:
         :param direction:To move forward 1 To move backward -1
         :return: None
         """
-        if not self.check_collision(direction):
-            self.rect.x = self.rect.x + direction * self.direction[0] * self.velocity
-            self.rect.y = self.rect.y + direction * self.direction[1] * self.velocity
+        cannot_move_x,cannot_move_y = self.check_collision(direction)
+        print(f"Can move in x:{not cannot_move_x}, Can't move in y:{not cannot_move_y}")
+        self.rect.x = self.rect.x + direction * self.direction[0] * self.velocity if not cannot_move_x else self.rect.x
+        self.rect.y = self.rect.y + direction * self.direction[1] * self.velocity if not cannot_move_y else self.rect.y
 
     def rotate(self,direction):
         """
@@ -66,8 +67,9 @@ class Player:
         self.direction[0] = math.cos(self.angle)
         self.direction[1] = math.sin(self.angle)
 
-    def check_collision(self,direction)->bool:
-        x = self.rect.x + direction * self.direction[0] * self.velocity
+    def check_collision(self,direction)->tuple[bool,bool]:
+        cannot_move_x,cannot_move_y = False,False
+        x = self.rect.x
         y = self.rect.y + direction * self.direction[1] * self.velocity
 
         if self.direction[1]*direction < 0: #We are going up
@@ -75,26 +77,30 @@ class Player:
             left_x = x
             right_x = x+self.rect.width
             if self.game.is_wall(left_x, top_y) or self.game.is_wall(right_x, top_y):
-                return True
+                cannot_move_y = True
         if self.direction[1]*direction > 0: #We are going down
-            bottom_y = y+self.rect.height
+            bottom_y = y +self.rect.height + 1
             left_x = x
             right_x = x+self.rect.width
             if self.game.is_wall(left_x, bottom_y) or self.game.is_wall(right_x, bottom_y):
-                return True
+                cannot_move_y = True
+
+        x = self.rect.x + direction * self.direction[0] * self.velocity
+        y = self.rect.y
+
         if self.direction[0]*direction < 0: #We are going left
             left_x = x
             top_y = y
             bottom_y = y+self.rect.height
             if self.game.is_wall(left_x,top_y) or self.game.is_wall(left_x,bottom_y):
-                return True
+                cannot_move_x = True
         if self.direction[0]*direction > 0: # We are going right
-            right_x = x + self.rect.width
+            right_x = x + self.rect.width + 1
             top_y = y
             bottom_y = y+self.rect.height
             if self.game.is_wall(right_x,top_y) or self.game.is_wall(right_x,bottom_y):
-                return True
-        return False
+                cannot_move_x = True
+        return cannot_move_x,cannot_move_y
 
     def update(self):
         if self.z_key_pressed:
