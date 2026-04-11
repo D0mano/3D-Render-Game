@@ -4,6 +4,7 @@ import random
 from map import Map
 from player import Player
 from ray_engine import RayEngine
+from renderer import Renderer
 
 class Game:
     FPS = 60
@@ -13,7 +14,6 @@ class Game:
         self.map_col = 10
         self.map_row = 10
         self.map = Map(self,self.map_col,self.map_row)
-        self.ray_engine = RayEngine(self)
         self.tile_original_size = 16
         self.scale = 5
         self.tile_size = self.tile_original_size * self.scale
@@ -22,6 +22,8 @@ class Game:
         self.player = Player(self)
         self.running = True
 
+        self.renderer = Renderer(self)
+
     def is_wall(self, map_x, map_y):
         return self.map.is_wall(map_x, map_y)
 
@@ -29,13 +31,13 @@ class Game:
         self.screen.fill((0,0,0))
         # self.map.draw()
         # self.player.draw()
-        self.ray_engine.draw()
+        self.renderer.draw()
 
     def update(self):
         for event in pygame.event.get():
             self.handle_events(event)
         self.player.update()
-        self.ray_engine.update()
+        self.renderer.update()
 
     def display_tile_map(self):
         for row in self.map.tile_map:

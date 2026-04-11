@@ -5,7 +5,6 @@ import utils
 
 class RayEngine:
     FOV = 60
-    NUM_RAYS = 1000
     MAX_DEPTHS = 30
     RES  = 1
 
