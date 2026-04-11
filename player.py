@@ -51,7 +51,6 @@ class Player:
         :return: None
         """
         cannot_move_x,cannot_move_y = self.check_collision(direction)
-        print(f"Can move in x:{not cannot_move_x}, Can't move in y:{not cannot_move_y}")
         self.rect.x = self.rect.x + direction * self.direction[0] * self.velocity if not cannot_move_x else self.rect.x
         self.rect.y = self.rect.y + direction * self.direction[1] * self.velocity if not cannot_move_y else self.rect.y
 

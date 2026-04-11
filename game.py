@@ -10,12 +10,12 @@ class Game:
     def __init__(self):
 
         self.clock = pygame.time.Clock()
-        self.map_col = 20
-        self.map_row = 20
+        self.map_col = 10
+        self.map_row = 10
         self.map = Map(self,self.map_col,self.map_row)
         self.ray_engine = RayEngine(self)
         self.tile_original_size = 16
-        self.scale = 3
+        self.scale = 5
         self.tile_size = self.tile_original_size * self.scale
         self.screen_size = self.map_col * self.tile_size, self.map_row * self.tile_size
         self.screen = pygame.display.set_mode(self.screen_size)
