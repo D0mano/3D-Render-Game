@@ -36,6 +36,7 @@ class Map:
                     else:
                         line.append(0)
             tile_map.append(line)
+        tile_map[self.game.map_row//2][self.game.map_col//2] = 0
         return tile_map
 
     def draw(self):
@@ -43,7 +44,5 @@ class Map:
             for x in range(self.col):
                 if self.tile_map[y][x] == 1:
                     color = (255, 255, 255)
-                else:
-                    color = (0, 0, 0)
-                pygame.draw.rect(self.screen, color,
-                                 (x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size))
+                    pygame.draw.rect(self.screen, color,
+                                     (x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size))

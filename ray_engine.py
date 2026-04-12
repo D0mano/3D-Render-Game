@@ -4,14 +4,17 @@ import math
 import utils
 
 class RayEngine:
-    FOV = 60
+
     MAX_DEPTHS = 30
     RES  = 1
 
     def __init__(self,game):
         self.game = game
         self.NUM_RAYS = self.game.screen_size[0]
+        self.FOV = self.player.FOV
         self.rays = [{} for _ in range(self.NUM_RAYS)]
+        self.wall_img = pygame.image.load("wall.png")
+        self.wall_img = pygame.transform.scale(self.wall_img,(self.game.tile_size,self.game.tile_size))
 
     @property
     def player(self):
@@ -97,15 +100,32 @@ class RayEngine:
 
     def draw(self):
         for i,ray in enumerate(self.rays):
+            if self.game.mode_3D:
+                color = (255,255,255) if ray['side'] == 'vertical' else (160,160,160)
+                line_height = (self.game.tile_size / ray['dist']) * 415
 
-            # self.draw_2d_ray(ray,(0, 255, 0))
+                draw_begin = (self.game.screen_size[1] / 2) - (line_height / 2) + self.player.horizon
+                draw_end =  line_height
 
+                img_col = self.get_texture_col(ray)
+                img_col = pygame.transform.scale(img_col,(img_col.get_width(),line_height))
+                self.game.screen.blit(img_col,(i*self.RES,draw_begin))
 
-            color = (255,255,255) if ray['side'] == 'vertical' else (160,160,160)
-            line_height = (self.game.tile_size / ray['dist']) * 415
+            if self.game.mode_2D:
+                self.draw_2d_ray(ray,(0, 255, 0))
+                self.draw_2d_ray(self.cast_ray(self.player.angle))
 
-            draw_begin = (self.game.screen_size[1] / 2) - (line_height / 2)
-            draw_end =  line_height
+    def get_texture_col(self, ray):
+        if ray['side'] == 'horizontal':
+            # Sur un mur horizontal, la position sur la texture dépend de X
+            offset = ray['hit'][0] % self.game.tile_size
+        else:
+            # Sur un mur vertical, elle dépend de Y
+            offset = ray['hit'][1] % self.game.tile_size
 
-            pygame.draw.rect(self.game.screen,color,(i*self.RES,draw_begin,self.RES,draw_end))
-        self.draw_2d_ray(self.cast_ray(self.player.angle))
+        # Convertir l'offset en colonne de pixel dans la texture
+        tex_x = int((offset / self.game.tile_size) * self.wall_img.get_width())
+        tex_x = max(0, min(tex_x, self.wall_img.get_width() - self.RES))  # clamp
+
+        rect = pygame.Rect(tex_x, 0, self.RES, self.wall_img.get_height())
+        return self.wall_img.subsurface(rect)

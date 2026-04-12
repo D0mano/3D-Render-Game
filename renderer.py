@@ -12,7 +12,8 @@ class Renderer:
         self.player = self.ray_engine.player
 
     def draw(self):
-        self.draw_background()
+        if self.game.mode_3D:
+            self.draw_background()
         self.ray_engine.draw()
 
     def update(self):
